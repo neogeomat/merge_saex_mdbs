@@ -29,24 +29,41 @@ class App(Frame):
         import tkMessageBox
         import arcpy
         import glob
+        import os
+        import shutil
         from arcpy import env
         path = self.sheetentry1.get()
         #print(path)
-        list = glob.glob(path+"\**\*.mdb")
-        list.append(glob.glob(path+"\*.mdb"))
-        merged = "D:\\LIS_SYSTEM\\LIS_Spatial_Data\\merged.mdb\\"
+        if os.path.exists(path+"\\"+path.split("\\")[-1]+"_merged.mdb"):
+            os.remove(path+"\\"+path.split("\\")[-1]+"_merged.mdb")
+            print("old merged file deleted")
+        mdb_list = glob.glob(path+"\**\*.mdb")
+        mdb_list.extend(glob.glob(path+"\*.mdb"))
+        print(mdb_list)
+        # merged = "D:\\LIS_SYSTEM\\LIS_Spatial_Data\\merged.mdb"
+
+        # copy first file
+        try:
+            shutil.copy(mdb_list[0], path+"\\"+path.split("\\")[-1]+"_merged.mdb")
+            print("First file copied as "+path.split("\\")[-1]+"_merged.mdb")
+        except IOError as e:
+            print("Unable to copy file. %s" % e)
+        except:
+            print("Unexpected error:", sys.exc_info())
+        merged = path+"\\"+path.split("\\")[-1]+"_merged.mdb\\"
+
+        # start geoprocess
         layers = ["Parcel","Segments","Construction","Parcel_History"]
-        print(list)
-        for i in list:
+        
+        for i in mdb_list[1:]:
             env.workspace = i
             print (env.workspace)
 
-            #Setting input and output
-            inFeatures = ["Parcel"]
-
             for l in layers:
                 arcpy.Append_management(l, merged + l, "NO_TEST", "", "")
-
+                # print(merged + l)
+                # arcpy.Merge_management(l, merged)
+        print("process complete")
         tkMessageBox.showinfo(title="Merge Saex Mdb files", message="Done")
             
 root = Tk()
