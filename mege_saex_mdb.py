@@ -51,8 +51,8 @@ class App(Frame):
 
         # copy first file
         try:
-            shutil.copy(mdb_list[0], path+"\\"+path.split("\\")[-1]+"_merged.mdb")
-            print("First file copied as "+path.split("\\")[-1]+"_merged.mdb")
+            shutil.copy(r'D:\LIS_SYSTEM\LIS_Spatial_Data_Templates\BLANK84.mdb', path+"\\"+path.split("\\")[-1]+"_merged.mdb")
+            print("D:\\LIS_SYSTEM\\LIS_Spatial_Templates\\BLANK84.mdb copied as "+path.split("\\")[-1]+"_merged.mdb")
         except IOError as e:
             print("Unable to copy file. %s" % e)
         except:
@@ -62,7 +62,7 @@ class App(Frame):
         # start geoprocess
         layers = ["Parcel","Segments","Construction","Parcel_History"]
         
-        for i in mdb_list[1:]:
+        for i in mdb_list:
             env.workspace = i
             print (env.workspace)
 
