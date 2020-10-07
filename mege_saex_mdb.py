@@ -37,8 +37,15 @@ class App(Frame):
         if os.path.exists(path+"\\"+path.split("\\")[-1]+"_merged.mdb"):
             os.remove(path+"\\"+path.split("\\")[-1]+"_merged.mdb")
             print("old merged file deleted")
-        mdb_list = glob.glob(path+"\**\*.mdb")
-        mdb_list.extend(glob.glob(path+"\*.mdb"))
+        # mdb_list = glob.glob(path+"\**\*.mdb")
+        # mdb_list.extend(glob.glob(path+"\*.mdb"))
+
+        mdb_list = []
+        for root, dirnames, filenames in os.walk(path):
+            for filename in filenames:
+                if filename.endswith('.mdb'):
+                    mdb_list.append(os.path.join(root, filename))
+        
         print(mdb_list)
         # merged = "D:\\LIS_SYSTEM\\LIS_Spatial_Data\\merged.mdb"
 
