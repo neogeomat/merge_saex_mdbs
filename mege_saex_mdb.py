@@ -1,7 +1,9 @@
 from Tkinter import *
-from tkMessageBox import showerror
+
+version = "v2.1.1"
 
 class App(Frame):
+    global version
     def __init__(self, master):
         Frame.__init__(self,master)
         self.pack()
@@ -19,13 +21,28 @@ class App(Frame):
         #create entry.
         self.sheetentry1= Entry(self,width=30)
         self.sheetentry1.grid(row=0, column =1, sticky=E+W+N+S)        
-    
-        
+
         #create calculate button
-        self.button4=Button(self, text="Process", command=self.parcelIDcreator, width=30)
+        self.button4=Button(self, text="Process", command=self.mergeSaexMdbs, width=30)
         self.button4.grid(row=1, column=1, sticky=E+W+N+S)
 
-    def parcelIDcreator (self):   
+        self.Sheet = Label (self, text="Instruction", width=30, font=("Helvetica", 10, "bold italic"), fg="blue")
+        self.Sheet.grid (row=2, column=0, padx=5, pady=5, sticky=E + W + N + S)
+
+        instruction = """\n Merges parcel, segments, construction and history layers from all saex mdb files in a folder. Requires arcpy (available through arcgis 10.x) and saex. Python executable must be from the arcgis installation.
+
+Input: Folder path Output: merged database of name path_merged, It uses BLANK84 template.
+
+How to run: open the file in python idle and run (press F5). If error occurs, the process repeats from start (deletes the file created before).
+
+If run from a network location, the process may appear as not running as network file access is slower.
+
+For recent file check https://github.com/neogeomat/SaexDataCleanUpScripts
+        """
+        self.Sheet = Label (self, text=instruction, width=50, justify=LEFT, wraplength=400)
+        self.Sheet.grid (row=3, columnspan=2, padx=5, pady=5, sticky=E + W + N + S)
+
+    def mergeSaexMdbs (self):
         import tkMessageBox
         import arcpy
         import glob
@@ -46,7 +63,8 @@ class App(Frame):
                 if filename.endswith('.mdb'):
                     mdb_list.append(os.path.join(root, filename))
         
-        print(mdb_list)
+        # print(mdb_list)
+        total_mdbs = len (mdb_list)
         # merged = "D:\\LIS_SYSTEM\\LIS_Spatial_Data\\merged.mdb"
 
         # copy first file
@@ -61,20 +79,20 @@ class App(Frame):
 
         # start geoprocess
         layers = ["Parcel","Segments","Construction","Parcel_History"]
-        
+        count = 0
         for i in mdb_list:
             env.workspace = i
-            print (env.workspace)
-
+            count += 1
+            print (env.workspace + " (" + str (count) + "/" + str (total_mdbs) + ")")
             for l in layers:
                 arcpy.Append_management(l, merged + l, "NO_TEST", "", "")
                 # print(merged + l)
                 # arcpy.Merge_management(l, merged)
         print("process complete")
-        tkMessageBox.showinfo(title="Merge Saex Mdb files", message="Done")
+        tkMessageBox.showinfo(title="Merge Saex Mdb files" + version, message="Done")
             
 root = Tk()
-root.title("Merge Saex Mdb files")
+root.title("Merge Saex Mdb files" + version)
 myapp = App(root)
 myapp.mainloop()
 
